@@ -11,6 +11,7 @@ Accepted file extensions: `*.csv`, `*.tsv`
 ## Technologies
 `API` is created using `Flask`
 `Machine Learning` using `SkLearn`
+`API Specification & Docs` using `Swagger`
 
 ## Future features:
 - Crawler for collecting data form various websites
