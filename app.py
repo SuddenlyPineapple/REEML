@@ -3,6 +3,7 @@ import pickle
 import flask
 import pandas as pd
 import json
+from RealEstateEstaminator import RealEstateEstaminator
 from flask import Flask
 from flask import request
 from flask_restplus import Api, Resource, fields
@@ -44,7 +45,6 @@ model = pickle.load(open("model.pkl", "rb"))
 # curl 'http://localhost:5000/estaminator/predict' -d '{"sqrMeters":71, "rooms":2, "location":"Wilda"} ' -XPOST -H "Content-type: application/json"
 @name_space.route('/predict', methods=['POST'])
 class Prediction(Resource):
-
     @api.doc(responses={200: 'OK', 400: 'Invalid Argument', 500: 'Internal Error'})
     @api.expect(prediction_data_model)
     def post(self):
@@ -72,11 +72,11 @@ class Prediction(Resource):
 
 
 # curl 'http://localhost:5000/estaminator/import_csv' -F 'data=@/mnt/c/Users/Wojtek/Google Drive/Studia/Semestr 4/Technologie_Sieciowe_Lab_A_Szwabe/REEML/ceny_mieszkan_w_poznaniu.tsv' -XPOST
-@name_space.route('/import_csv', methods=['POST'])
+@name_space.route('/import_csv', methods=['PUT'])
 class DataImporter(Resource):
     @api.doc(responses={200: 'OK', 400: 'Invalid Argument', 500: 'Internal Error'})
     @api.expect(expectImport)
-    def post(self):
+    def put(self):
         try:
             if 'file' not in request.files:
                 raise Exception("Illegal file extension")
@@ -91,6 +91,7 @@ class DataImporter(Resource):
 
                 # return redirect(url_for('uploaded_file', filename=filename))
                 # TODO: Retrenowanie modelu - napisac funckje
+                app.model = RealEstateEstaminator.deploy_model()
 
                 return flask.jsonify({'import_result': True, 'imported_file': file.filename})
             else:
@@ -101,6 +102,12 @@ class DataImporter(Resource):
         except Exception as e:
             name_space.abort(400, e, status="Could not retrieve information", statusCode="400")
 
+@name_space.route('/postman_collection', methods=['GET'])
+class PostmanCollection(Resource):
+    @api.doc(responses={200: 'OK'})
+    def get(self):
+        data = api.as_postman(urlvars=False, swagger=True)
+        return flask.jsonify(data)
 
 if __name__ == '__main__':
     app.run()
