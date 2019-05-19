@@ -12,7 +12,6 @@ from werkzeug.utils import secure_filename
 
 # Project Scoped Imports
 from config import UPLOAD_FOLDER
-from enhancer import FeatureEnhancer
 from functions import allowed_file
 
 app = Flask(__name__)
@@ -40,7 +39,8 @@ prediction_data_model = api.model('Prediction Model',
 expectImport = api.parser().add_argument('file', type=FileStorage, location='files')
 
 # getting our trained model from a file we created earlier for prediction purposes
-model = pickle.load(open("model.pkl", "rb"))
+#model = pickle.load(open("model.pkl", "rb"))
+REE = RealEstateEstaminator()
 
 # curl 'http://localhost:5000/estaminator/predict' -d '{"sqrMeters":71, "rooms":2, "location":"Wilda"} ' -XPOST -H "Content-type: application/json"
 @name_space.route('/predict', methods=['POST'])
@@ -58,7 +58,7 @@ class Prediction(Resource):
             # prediction = model.predict([feature_array]).tolist()
 
             # predicting estimated price - our model rates flat based on the input array
-            prediction = model.predict(data_frame).tolist()[0]
+            prediction = REE.trained_model.predict(data_frame).tolist()[0]
 
             # preparing a response object and storing the model's predictions
             response = {'predictions': prediction}
@@ -89,9 +89,8 @@ class DataImporter(Resource):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-                # return redirect(url_for('uploaded_file', filename=filename))
-                # TODO: Retrenowanie modelu - napisac funckje
-                app.model = RealEstateEstaminator.deploy_model()
+                #Model Retraining
+                REE.deploy_model()
 
                 return flask.jsonify({'import_result': True, 'imported_file': file.filename})
             else:

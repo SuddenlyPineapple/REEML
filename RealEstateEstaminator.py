@@ -1,3 +1,4 @@
+from datetime import datetime
 import pickle
 import pandas as pd
 import sklearn.model_selection
@@ -12,7 +13,7 @@ import config
 
 class RealEstateEstaminator:
     files = {'ceny_mieszkan_w_poznaniu.tsv'}
-    model = []
+    trained_model = []
 
     def __init__(self):
         self.deploy_model()
@@ -29,7 +30,10 @@ class RealEstateEstaminator:
             li.append(df)
 
         r = pd.concat(li, axis=0, ignore_index=True)
-        #print(r)
+
+        print(r)
+
+        print("[",datetime.now().strftime("%d/%b/%y %H:%M:%S") ,"] Rows count for data model training: [", r.__len__(),"]")
 
         # Podzial danych na dane testowe i dane do trenowania
         r_train, r_test = sklearn.model_selection.train_test_split(r, test_size=0.2)
@@ -63,18 +67,19 @@ class RealEstateEstaminator:
         # model_p = pickle.load(open("model.pkl","rb"))
         # model_p.predict([[sqr_meters, no_of_rooms]])
 
-        input_df = pd.DataFrame({
-            'sqrMeters': pd.Series([20]),
-            'rooms': pd.Series([4]),
-            'isNew': pd.Series([False]),
-            'location': pd.Series(['Wilda'])
-        })
-
-        print(input_df)
+        # Przykładowa Predykcja
+        # input_df = pd.DataFrame({
+        #     'sqrMeters': pd.Series([20]),
+        #     'rooms': pd.Series([4]),
+        #     'isNew': pd.Series([False]),
+        #     'location': pd.Series(['Wilda'])
+        # })
+        #print(input_df)
         #print(p.predict(input_df))
 
+        cls.trained_model = p
         return p
 
 
 
-model = RealEstateEstaminator.deploy_model()
+#model = RealEstateEstaminator.deploy_model()
