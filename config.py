@@ -1,3 +1,4 @@
+### Note: UPLOAD_FOLDER Must be in application folder and PATH must lead to UPLOAD_FOLDER
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'cvs', 'tsv'}
 
