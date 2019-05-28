@@ -1,8 +1,6 @@
 import os
-import pickle
 import flask
 import pandas as pd
-import json
 from RealEstateEstaminator import RealEstateEstaminator
 from flask import Flask
 from flask import request
@@ -26,16 +24,23 @@ name_space = api.namespace('estaminator', description='Main APIs')
 
 prediction_data_model = api.model('Prediction Model',
 		  {
-              'sqrMeters': fields.Integer(required = True,
-					 description="Room size",
+              'isNew': fields.Boolean(required = True,
+					 description="Describes whether the flat is new or used",
 					 help="Cannot be blank."),
               'rooms': fields.Integer(required = True,
 					 description="Amount of rooms",
 					 help="Cannot be blank."),
+              'floor': fields.Integer(required = True,
+					 description="Level where the flat is located",
+					 help="Cannot be blank."),
               'location': fields.String(required = True,
 					 description="Location of property",
 					 help="Cannot be blank."),
+              'sqrMeters': fields.Integer(required = True,
+					 description="Room size",
+					 help="Cannot be blank."),
           })
+
 expectImport = api.parser().add_argument('file', type=FileStorage, location='files')
 
 # getting our trained model from a file we created earlier for prediction purposes
@@ -53,17 +58,19 @@ class Prediction(Resource):
             # feature_array = request.get_json()['feature_array']
             feature_array = request.get_json()
             data_frame = pd.DataFrame(feature_array, index=[0])
-            # print(data_frame)
 
+            data_frame['location'] = REE.le.transform(data_frame['location'])
+
+            # print(data_frame)
             # prediction = model.predict([feature_array]).tolist()
 
-            # predicting estimated price - our model rates flat based on the input array
+            ### Predicting estimated price - our model rates flat based on the input array
             prediction = REE.trained_model.predict(data_frame).tolist()[0]
 
-            # preparing a response object and storing the model's predictions
-            response = {'predictions': prediction}
+            ### Preparing a response object and storing the model's predictions
+            response = {'predictions': round(prediction, 2) }
 
-            # sending our response object back as json
+            ### Sending our response object back as json
             return flask.jsonify(response)
         except KeyError as e:
             name_space.abort(500, e.__doc__, status="Could not retrieve information", statusCode="500")
@@ -92,7 +99,7 @@ class DataImporter(Resource):
                 #Model Retraining
                 REE.deploy_model()
 
-                return flask.jsonify({'import_result': True, 'imported_file': file.filename})
+                return flask.jsonify({'import_result': True, 'imported_file': file.filename, 'score': REE.score})
             else:
                 raise Exception("File not allowed")
 
