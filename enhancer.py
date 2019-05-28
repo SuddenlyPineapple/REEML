@@ -14,4 +14,4 @@ class FeatureEnhancer(BaseEstimator):
         out = X.copy()
         out['is_center'] = X['location'].map(get_is_center)
         #print(out)
-        return out[['sqrMeters', 'rooms','is_center']]
+        return out[['sqrMeters','rooms','is_center']]
