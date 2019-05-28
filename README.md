@@ -4,13 +4,14 @@ It's project for studies on Poznan University of Technology and part of Allegro 
 
 ## Run
 Just run it in PyCharm IDE with app.py as entry point or in console `python app.py` <br />
-#### Reuirements
- - Python3
- - All packages from `Pipfile`
- - `UPLOAD_FOLDER` must be in our application folder and `PATH` must lead to `UPLOAD_FOLDER` in order to run application (it will change in future)
-
+### Requirements/Notes:
+ - Python 3.6,
+ - Install all packages from `Pipfile` or `requirements.txt`,
+ - `UPLOAD_FOLDER` must be in our application folder and `PATH` must lead to `UPLOAD_FOLDER` in order to run application (it will change in future),
+ - If running on Docker uncomment last line in `app.py` file (`app.run(host='0.0.0.0')`) and comment previous `app.run()` line. 
 ## Prediction
-Prediction is estimated using `Gradient Boosting Regression` model.
+Prediction is estimated using `Gradient Boosting Regression` model. <br />
+Experiments and tests can be found in `REEML.ipynb`
 
 ## Importing files
 Accepted file extensions: `*.csv`, `*.tsv`

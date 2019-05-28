@@ -117,3 +117,5 @@ class PostmanCollection(Resource):
 
 if __name__ == '__main__':
     app.run()
+    ### When running on Docker use line below
+    #app.run(host='0.0.0.0')
